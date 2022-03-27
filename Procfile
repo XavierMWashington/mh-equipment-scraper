@@ -1,1 +1,1 @@
-scraper: web
+scraper: python manage.py runserver
