@@ -8,6 +8,7 @@ beautifulsoup4 = "*"
 requests = "*"
 python-decouple = "*"
 Django = "*"
+gunicorn = "*"
 
 [dev-packages]
 

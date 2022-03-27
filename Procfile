@@ -1,1 +1,1 @@
-scraper: python manage.py runserver
+web: guinicorn mhEquipmentScraper.wsgi --log-file -
