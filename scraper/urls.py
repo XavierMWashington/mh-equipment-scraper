@@ -3,7 +3,6 @@ from . import views
 
 # URLConf
 urlpatterns = [
-    path('', views.greet),
     path('hrhelms/', views.highRankHelms),
     path('lrhelms/', views.lowRankHelms),
     path('hrchests/', views.highRankChests),
