@@ -9,7 +9,7 @@ import os
 
 # Create your views here.
 def greet(request):
-    return HttpResponse('Hello, world')
+    return HttpResponse('Hello, user')
 
 def highRankHelms(request):
     urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Head+Armor"
