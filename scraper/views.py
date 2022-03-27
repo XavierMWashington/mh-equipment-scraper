@@ -67,7 +67,6 @@ def scrapeData(url, rankNum):
     iter = 0
 
     for row in tableBody[rankNum]:
-
         try:
             skillData = row.find_all("td")[1].find_all("a")
             imgData = row.find_all("td")[2].find_all("img")
