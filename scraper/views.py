@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from bs4 import BeautifulSoup
 import requests
 import json
+import os
 
 
 # Create your views here.
