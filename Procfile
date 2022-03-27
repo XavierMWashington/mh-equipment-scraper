@@ -1,1 +1,1 @@
-web: guinicorn mhEquipmentScraper.wsgi --log-file -
+web: gunicorn mhEquipmentScraper.wsgi --log-file -
