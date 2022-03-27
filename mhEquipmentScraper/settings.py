@@ -29,7 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://mh-equip-api.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['mh-equip-api.herokuapp.com', 'localhost']
 
 
 # Application definition
