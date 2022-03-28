@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from bs4 import BeautifulSoup
+from selenium import webdriver
 import requests
 import json
 import os
@@ -14,6 +15,7 @@ def greet(request):
 def highRankHelms(request):
     urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Head+Armor"
     return scrapeData(urlRequest, 0)
+
 
 def lowRankHelms(request):
     urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Head+Armor"
@@ -47,16 +49,62 @@ def highRankLegs(request):
     urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Legs+Armor"
     return scrapeData(urlRequest, 0) 
 
-def highRankLegs(request):
+def lowRankLegs(request):
     urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Legs+Armor"
     return scrapeData(urlRequest, 1)   
 
+def fetchProxy():
+    response = requests.get("https://free-proxy-list.net")
+    content = BeautifulSoup(response.text, "lxml")
+    table = content.find('table')
+    rows = table.find_all('tr')
+    cols = [[col.text for col in row.find_all('td')] for row in rows]
+
+    proxies = []
+
+    for row in rows:
+        try:
+            dataRow = row.find_all('td')
+            if(dataRow[4].text == "elite proxy" and dataRow[6].text == "yes"):
+                proxies.append("https://" + dataRow[0].text + ":" + dataRow[1].text)
+        except:
+            pass
+
+
+    #print(proxies)
+    return proxies
+
+
+
 def scrapeData(url, rankNum):
-    result = requests.get(url)
-    soup = BeautifulSoup(result.text, "html.parser")
+    proxies = fetchProxy()
+    uaheaders = {
+        'User-Agent': 'Mozilla/5.0',
+    }
+
+    session = requests.Session()
+    
+    for proxy in proxies:
+        print(proxy)
+        session.proxies = {"http":proxy, "https": proxy}
+        session.trust_env = False
+    
+        try:
+            result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
+            break
+        except:
+            pass
+    
+
+    try:
+        soup = BeautifulSoup(result.text, "html.parser")
+    except:
+        return HttpResponse("Error: None of the supplied proxies will work")
 
     for s in soup.select('script'):
         s.extract()
+
+    #print(soup)
 
     tableBody = soup.find_all("tbody")
 
@@ -109,3 +157,4 @@ def scrapeData(url, rankNum):
     formattedJson = json.dumps(parse, indent=4)
 
     return HttpResponse(formattedJson)
+

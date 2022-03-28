@@ -12,6 +12,6 @@ urlpatterns = [
     path('lrarms/', views.lowRankArms),
     path('hrwaists/', views.highRankWaists),
     path('lrwaists/', views.lowRankWaists),
-    # path('hrlegs/', views.highRankLegs),
-    # path('lrlegs/', views.lowRankLegs)
+    path('hrlegs/', views.highRankLegs),
+    path('lrlegs/', views.lowRankLegs)
 ]

@@ -10,6 +10,9 @@ python-decouple = "*"
 Django = "*"
 gunicorn = "*"
 whitenoise = "*"
+django-cors-headers = "*"
+selenium = "*"
+lxml = "*"
 
 [dev-packages]
 
