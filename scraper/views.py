@@ -12,47 +12,6 @@ import os
 def greet(request):
     return HttpResponse('Hello, user')
 
-def highRankHelms(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Head+Armor"
-    return scrapeData(urlRequest, 0)
-
-
-def lowRankHelms(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Head+Armor"
-    return scrapeData(urlRequest, 1)
-
-def highRankChests(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Chest+Armor"
-    return scrapeData(urlRequest, 0)
-
-def lowRankChests(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Chest+Armor"
-    return scrapeData(urlRequest, 1)
-
-def highRankArms(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Arms+Armor"
-    return scrapeData(urlRequest, 0)
-
-def lowRankArms(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Arms+Armor"
-    return scrapeData(urlRequest, 1)
-
-def highRankWaists(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Waist+Armor"
-    return scrapeData(urlRequest, 0)
-
-def lowRankWaists(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Waist+Armor"
-    return scrapeData(urlRequest, 1)
-
-def highRankLegs(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Legs+Armor"
-    return scrapeData(urlRequest, 0) 
-
-def lowRankLegs(request):
-    urlRequest = "https://monsterhunterrise.wiki.fextralife.com/Legs+Armor"
-    return scrapeData(urlRequest, 1)   
-
 def fetchProxy():
     response = requests.get("https://free-proxy-list.net")
     content = BeautifulSoup(response.text, "lxml")
@@ -75,8 +34,15 @@ def fetchProxy():
     return proxies
 
 
+def scrapeData(request, slug):
 
-def scrapeData(url, rankNum):
+    rankNum = int(slug[0])
+
+    slug = slug[2:]
+
+    print(rankNum)
+    print(slug)
+
     proxies = fetchProxy()
     uaheaders = {
         'User-Agent': 'Mozilla/5.0',
@@ -88,7 +54,9 @@ def scrapeData(url, rankNum):
         print(proxy)
         session.proxies = {"http":proxy, "https": proxy}
         session.trust_env = False
-    
+
+        url = "https://monsterhunterrise.wiki.fextralife.com/" + slug + "+Armor"
+  
         try:
             result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
             break
@@ -99,10 +67,7 @@ def scrapeData(url, rankNum):
     try:
         soup = BeautifulSoup(result.text, "html.parser")
     except:
-        return HttpResponse("Error: None of the supplied proxies will work")
-
-    for s in soup.select('script'):
-        s.extract()
+        return HttpResponse("Error: None of the supplied proxies works")
 
     #print(soup)
 
