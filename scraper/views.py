@@ -185,9 +185,6 @@ def scrapeArmor(request, slug):
                     slot = "Gem lv " + str(i)
                     break
             images.append(slot)
-        
-        while "" in rampageSkills:
-            rampageSkills.remove("")
 
         if(slug == "Hunting+Horns"):
             rarityScraper=6
@@ -234,7 +231,7 @@ def scrapeArmor(request, slug):
             specialAmmoType = row.find_all("td")[7].text
             bowgunData = {"Deviation" : deviation, "Recoil" : recoil, "Reload Speed" : bgReload, "Cluster Bomb Type" : clusterBombType, "Special Ammo Type" : specialAmmoType}
 
-        elif("Bow"):
+        elif(slug == "Bow"):
             defenseBonusScraper = 9
             rarityScraper = 10
             rampageSkillsScraper = 11
@@ -259,10 +256,14 @@ def scrapeArmor(request, slug):
                 "Charge Shot 2": chargeShot2, "Charge Shot 3": chargeShot3, \
                     "Charge Shot 4": chargeShot4, "Coatings": coatings}         
 
-
         rampageSkillsData = row.find_all("td")[rampageSkillsScraper].find_all("li")
         for data in rampageSkillsData:
             rampageSkills.append(data.text)
+
+        while "" in rampageSkills:
+            rampageSkills.remove("")
+
+
 
         weapons.append(
         {"Name" : row.find_all("td")[nameScraper].find("a").text, \

@@ -13,6 +13,7 @@ whitenoise = "*"
 django-cors-headers = "*"
 selenium = "*"
 lxml = "*"
+logger = "*"
 
 [dev-packages]
 
