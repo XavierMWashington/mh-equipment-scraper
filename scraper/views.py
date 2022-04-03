@@ -231,7 +231,7 @@ def scrapeArmor(request, slug):
             specialAmmoType = row.find_all("td")[7].text
             bowgunData = {"Deviation" : deviation, "Recoil" : recoil, "Reload Speed" : bgReload, "Cluster Bomb Type" : clusterBombType, "Special Ammo Type" : specialAmmoType}
 
-        elif(slug == "Bow"):
+        elif(slug == "Bows"):
             defenseBonusScraper = 9
             rarityScraper = 10
             rampageSkillsScraper = 11
@@ -263,8 +263,6 @@ def scrapeArmor(request, slug):
         while "" in rampageSkills:
             rampageSkills.remove("")
 
-
-
         weapons.append(
         {"Name" : row.find_all("td")[nameScraper].find("a").text, \
             "Gems": images, \
@@ -276,16 +274,16 @@ def scrapeArmor(request, slug):
                     "Rampage Skills": rampageSkills})
 
         if(melodies != None):
-            weapons.append({"Melodies ":melodies})
+            weapons[iter].update({"Melodies ":melodies})
 
         if(shelling != None):
-            weapons.append({"Shelling Type": shelling[0], "Shelling Level": shelling[1]})
+            weapons[iter].update({"Shelling Type": shelling[0], "Shelling Level": shelling[1]})
         
         if(phialType != None):
-            weapons.append({"Phial Type:" : phialType})
+            weapons[iter].update({"Phial Type:" : phialType})
 
         if(kinsectLevel != None):
-            weapons.append({"Kinsect Level": kinsectLevel})
+            weapons[iter].update({"Kinsect Level": kinsectLevel})
 
         if(bowgunData != None):
             weapons[iter].update(bowgunData)
