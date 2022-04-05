@@ -16,7 +16,6 @@ def fetchProxy():
     content = BeautifulSoup(response.text, "lxml")
     table = content.find('table')
     rows = table.find_all('tr')
-    cols = [[col.text for col in row.find_all('td')] for row in rows]
 
     proxies = []
 
@@ -43,79 +42,82 @@ def scrapeArmor(request, slug):
     result = ""
     url = ""
     
-    if(slug[0].isnumeric()):
-        rankNum = int(slug[0])
+    rank = slug[0:2]
+    if(rank == "lr"):
+        rankNum = 1
+    elif(rank == "hr"):
+        rankNum = 0
 
-        slug = slug[2:]
+    slug = slug[3:]
+    
+    for proxy in proxies:
+        print(proxy)
+        session.proxies = {"http":proxy, "https": proxy}
+        session.trust_env = False
+
+        url = "https://monsterhunterrise.wiki.fextralife.com/" + slug + "+Armor"
         
-        for proxy in proxies:
-            print(proxy)
-            session.proxies = {"http":proxy, "https": proxy}
-            session.trust_env = False
-
-            url = "https://monsterhunterrise.wiki.fextralife.com/" + slug + "+Armor"
-            
-            try:
-                result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
-                break
-            except:
-                pass
-        
-
         try:
-            soup = BeautifulSoup(result.text, "html.parser")
+            result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
+            break
         except:
-            return HttpResponse("Error: None of the supplied proxies works")
+            pass
+    
 
-        tableBody = soup.find_all("tbody")
+    try:
+        soup = BeautifulSoup(result.text, "html.parser")
+    except:
+        return HttpResponse("Error: None of the supplied proxies works")
 
-        armor = []
-        skills = []
-        images = []
+    tableBody = soup.find_all("tbody")
 
-        for row in tableBody[rankNum]:
-            try:
-                skillData = row.find_all("td")[1].find_all("a")
-                imgData = row.find_all("td")[2].find_all("img")
+    armor = []
+    skills = []
+    images = []
+
+    for row in tableBody[rankNum]:
+        try:
+            skillData = row.find_all("td")[1].find_all("a")
+            imgData = row.find_all("td")[2].find_all("img")
+            
+            for data in skillData:
+                skills.append(data.text)
+
+            while "" in skills:
+                skills.remove("")
+
+            for data in imgData:
+                slot = ""
+                for i in range (1, 4):
+                    if("level " + str(i) in str(data["alt"])):
+                        slot = "Gem Lv " + str(i)
+                        break
                 
-                for data in skillData:
-                    skills.append(data.text)
+                images.append(slot)
+            
+            armor.append(
+                {"Name" : row.find_all("td")[0].text, \
+                    "Skills" : skills, \
+                    "Gem Slots" : images, \
+                    "Rarity:" : row.find_all("td")[3].text, \
+                        "Defense": row.find_all("td")[4].text, \
+                            "Fire Resist": row.find_all("td")[5].text, \
+                            "Water Resist": row.find_all("td")[6].text, \
+                            "Thunder Resist": row.find_all("td")[7].text, \
+                            "Ice Resist" : row.find_all("td")[8].text, \
+                            "Dragon Resist" : row.find_all("td")[9].text})
 
-                while "" in skills:
-                    skills.remove("")
+            skills = []
+            images = []
+        except:
+            continue
 
-                for data in imgData:
-                    slot = ""
-                    for i in range (1, 4):
-                        if("level " + str(i) in str(data["alt"])):
-                            slot = "Gem Lv " + str(i)
-                            break
-                    
-                    images.append(slot)
-                
-                armor.append(
-                    {"Name" : row.find_all("td")[0].text, \
-                        "Skills" : skills, \
-                        "Gem Slots" : images, \
-                        "Rarity:" : row.find_all("td")[3].text, \
-                            "Defense": row.find_all("td")[4].text, \
-                                "Fire Resist": row.find_all("td")[5].text, \
-                                "Water Resist": row.find_all("td")[6].text, \
-                                "Thunder Resist": row.find_all("td")[7].text, \
-                                "Ice Resist" : row.find_all("td")[8].text, \
-                                "Dragon Resist" : row.find_all("td")[9].text})
+    #print(names)
+    jsonedArmor = json.dumps(armor)
+    parse = json.loads(jsonedArmor)
+    formattedJson = json.dumps(parse, indent=4)
 
-                skills = []
-                images = []
-            except:
-                continue
-
-        #print(names)
-        jsonedArmor = json.dumps(armor)
-        parse = json.loads(jsonedArmor)
-        formattedJson = json.dumps(parse, indent=4)
-
-        return HttpResponse(formattedJson)
+    return HttpResponse(formattedJson)
 
     #Scraping weapons
     weaponsShortCat = ['gs', 'ls', 'sns', 'db', 'h', 'hh', 'l', 'gl', 'sa', 'cb', 'ig', 'lbg', 'hbg', 'b']
