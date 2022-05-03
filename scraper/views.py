@@ -41,83 +41,88 @@ def scrapeArmor(request, slug):
     session = requests.Session()
     result = ""
     url = ""
+    armorSearch = False
     
     rank = slug[0:2]
     if(rank == "lr"):
         rankNum = 1
+        armorSearch = True
     elif(rank == "hr"):
         rankNum = 0
+        armorSearch = True
 
-    slug = slug[3:]
-    
-    for proxy in proxies:
-        print(proxy)
-        session.proxies = {"http":proxy, "https": proxy}
-        session.trust_env = False
+    if(armorSearch):
 
-        url = "https://monsterhunterrise.wiki.fextralife.com/" + slug + "+Armor"
+        slug = slug[3:]
         
-        try:
-            result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
-            break
-        except:
-            pass
-    
+        for proxy in proxies:
+            print(proxy)
+            session.proxies = {"http":proxy, "https": proxy}
+            session.trust_env = False
 
-    try:
-        soup = BeautifulSoup(result.text, "html.parser")
-    except:
-        return HttpResponse("Error: None of the supplied proxies works")
-
-    tableBody = soup.find_all("tbody")
-
-    armor = []
-    skills = []
-    images = []
-
-    for row in tableBody[rankNum]:
-        try:
-            skillData = row.find_all("td")[1].find_all("a")
-            imgData = row.find_all("td")[2].find_all("img")
+            url = "https://monsterhunterrise.wiki.fextralife.com/" + slug + "+Armor"
             
-            for data in skillData:
-                skills.append(data.text)
+            try:
+                result = requests.get(url, headers=uaheaders, proxies={"http" : proxy}, timeout=5)
+                break
+            except:
+                pass
+        
 
-            while "" in skills:
-                skills.remove("")
+        try:
+            soup = BeautifulSoup(result.text, "html.parser")
+        except:
+            return HttpResponse("Error: None of the supplied proxies works")
 
-            for data in imgData:
-                slot = ""
-                for i in range (1, 4):
-                    if("level " + str(i) in str(data["alt"])):
-                        slot = "Gem Lv " + str(i)
-                        break
+        tableBody = soup.find_all("tbody")
+
+        armor = []
+        skills = []
+        images = []
+
+        for row in tableBody[rankNum]:
+            try:
+                skillData = row.find_all("td")[1].find_all("a")
+                imgData = row.find_all("td")[2].find_all("img")
                 
-                images.append(slot)
-            
-            armor.append(
-                {"Name" : row.find_all("td")[0].text, \
-                    "Skills" : skills, \
-                    "Gem Slots" : images, \
-                    "Rarity:" : row.find_all("td")[3].text, \
-                        "Defense": row.find_all("td")[4].text, \
-                            "Fire Resist": row.find_all("td")[5].text, \
-                            "Water Resist": row.find_all("td")[6].text, \
-                            "Thunder Resist": row.find_all("td")[7].text, \
-                            "Ice Resist" : row.find_all("td")[8].text, \
-                            "Dragon Resist" : row.find_all("td")[9].text})
+                for data in skillData:
+                    skills.append(data.text)
 
-            skills = []
-            images = []
-        except:
-            continue
+                while "" in skills:
+                    skills.remove("")
 
-    #print(names)
-    jsonedArmor = json.dumps(armor)
-    parse = json.loads(jsonedArmor)
-    formattedJson = json.dumps(parse, indent=4)
+                for data in imgData:
+                    slot = ""
+                    for i in range (1, 4):
+                        if("level " + str(i) in str(data["alt"])):
+                            slot = "Gem Lv " + str(i)
+                            break
+                    
+                    images.append(slot)
+                
+                armor.append(
+                    {"Name" : row.find_all("td")[0].text, \
+                        "Skills" : skills, \
+                        "Gem Slots" : images, \
+                        "Rarity:" : row.find_all("td")[3].text, \
+                            "Defense": row.find_all("td")[4].text, \
+                                "Fire Resist": row.find_all("td")[5].text, \
+                                "Water Resist": row.find_all("td")[6].text, \
+                                "Thunder Resist": row.find_all("td")[7].text, \
+                                "Ice Resist" : row.find_all("td")[8].text, \
+                                "Dragon Resist" : row.find_all("td")[9].text})
 
-    return HttpResponse(formattedJson)
+                skills = []
+                images = []
+            except:
+                continue
+
+        #print(names)
+        jsonedArmor = json.dumps(armor)
+        parse = json.loads(jsonedArmor)
+        formattedJson = json.dumps(parse, indent=4)
+
+        return HttpResponse(formattedJson)
 
     #Scraping weapons
     weaponsShortCat = ['gs', 'ls', 'sns', 'db', 'h', 'hh', 'l', 'gl', 'sa', 'cb', 'ig', 'lbg', 'hbg', 'b']
@@ -135,10 +140,6 @@ def scrapeArmor(request, slug):
     for proxy in proxies:
         session.proxies = {"http":proxy, "https": proxy}
         session.trust_env = False
-
-        if(slug == "hh"):
-            rarityScraper = 6
-            rampageSkillsScraper = 7
 
         for i in range (0, len(weaponsShortCat)):
             if(slug == weaponsShortCat[i]):
